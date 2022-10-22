@@ -1,0 +1,17 @@
+{
+  "name": "monthly-reviews-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.15.12",
+    "serverless": "^3.23.0",
+    "serverless-esbuild": "^1.33.0"
+  }
+}
