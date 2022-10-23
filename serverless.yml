@@ -23,6 +23,8 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs16.x
+  stage: ${opt:stage, 'dev'}
+  # region: ${opt:region, 'us-east-1'}
 
 # you can overwrite defaults here
 #  stage: dev
@@ -61,10 +63,19 @@ provider:
 functions:
   hello:
     handler: handler.hello
-    # events:
-    #   - http:
-    #       path: /
-    #       method: get
+    events:
+      - http:
+          path: /
+          method: get
+
+  GetReviewById:
+    handler: handler.getReviewById
+    events:
+      - http:
+          path: /review
+          method: get
+    environment:
+      MONTHLY_REVIEWS_TABLE: !Ref MonthlyReviewsTable
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -105,16 +116,23 @@ functions:
 #    environment:
 #      variable2: value2
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    MonthlyReviewsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+  Outputs:
+    MonthlyReviewsTableName:
+      Value: !Ref MonthlyReviewsTable
+      Export:
+        Name: monthly-reviews-table-${self:provider.stage}
+
 plugins:
   - serverless-esbuild

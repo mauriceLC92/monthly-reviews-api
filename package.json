@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "seed": "node seed/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "aws-sdk": "^2.1238.0",
     "esbuild": "^0.15.12",
     "serverless": "^3.23.0",
     "serverless-esbuild": "^1.33.0"
