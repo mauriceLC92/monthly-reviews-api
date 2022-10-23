@@ -17,25 +17,33 @@ const getTableName = async () => {
 const monthlyReviews = [
   {
     email: "mauricelecordier@gmail.com",
+    somethingElse: {
+      hey: "hi"
+    }
   },
   {
     email: "mauricelecordier2@gmail.com",
+    somethingElse: {
+      hey: "hi"
+    }
   },
   {
     email: "mauricelecordier3@gmail.com",
+    somethingElse: {
+      hey: "hi"
+    }
   },
 ];
 
 const seedDatabase = async () => {
   const tableName = await getTableName();
-  console.log("monthlyReviews", monthlyReviews);
   console.log("tableName", tableName);
   const putReqs = monthlyReviews.map((x) => ({
     PutRequest: {
       Item: x,
     },
   }));
-
+  console.log("putReqs", putReqs)
   const req = {
     RequestItems: {
       [tableName]: putReqs,
@@ -48,4 +56,4 @@ const seedDatabase = async () => {
     .catch((err) => console.error(err));
 };
 
-seedDatabase().then(() => console.log("Seeding complete!"));
+seedDatabase();
