@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "seed": "node seed/seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npx sls deploy",
+    "remove": "npx sls remove"
   },
   "keywords": [],
   "author": "",
