@@ -1,3 +1,4 @@
+import { APIGatewayEvent } from "aws-lambda";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
 const dynamodb = new DocumentClient();
@@ -13,7 +14,7 @@ const getMonthlyReviewById = async () => {
 
 }
 
-export const getReviewById = async (event) => {
+export const getReviewById = async (event: APIGatewayEvent) => {
   return {
     statusCode: 200,
     body: JSON.stringify(

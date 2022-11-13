@@ -1,15 +1,3 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
 useDotenv: true
 
 service: monthly-reviews-api
@@ -19,17 +7,15 @@ service: monthly-reviews-api
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
-  # region: ${opt:region, 'us-east-1'}
-
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+  environment:
+    USER_POOL_ID: !Ref MagicLinkUserPool
+  region: ${opt:region, 'us-east-1'}
 
   iamRoleStatements:
     - Effect: Allow
@@ -41,18 +27,14 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:BatchGetItem
       Resource: !GetAtt MonthlyReviewsTable.Arn
+    - Effect: "Allow"
+      Action:
+        - cognito-idp:AdminGetUser
+        - cognito-idp:AdminUpdateUserAttributes
+      Resource: !GetAtt MagicLinkUserPool.Arn
 
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  patterns:
-#    - '!exclude-me.js'
-#    - '!exclude-me-dir/**'
-#    - include-me.js
-#    - include-me-dir/**
+custom:
+  stage: ${opt:stage, 'dev'}
 
 functions:
   hello:
@@ -62,7 +44,53 @@ functions:
           path: /
           method: get
 
-  GetReviewById:
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: /login
+          method: post
+    environment:
+      URL:
+        {
+          "Fn::Join":
+            [
+              "",
+              [
+                "https://",
+                { "Ref": "ApiGatewayRestApi" },
+                ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}",
+              ],
+            ],
+        }
+  # 1. Define auth challenge (letting Cognito know that we have a custom challenge)
+  define-auth-challenge:
+    handler: api/define-auth-challenge.handler
+    events:
+      - cognitoUserPool:
+          pool: ${self:custom.userPoolName}
+          trigger: DefineAuthChallenge
+          existing: true
+
+  # 2. Create the actual auth challenge
+  create-auth-challenge:
+    handler: api/create-auth-challenge.handler
+    events:
+      - cognitoUserPool:
+          pool: ${self:custom.userPoolName}
+          trigger: CreateAuthChallenge
+          existing: true
+
+  # 3. Verify auth challenge
+  verify-auth-challenge:
+    handler: api/verify-auth-challenge.handler
+    events:
+      - cognitoUserPool:
+          pool: ${self:custom.userPoolName}
+          trigger: VerifyAuthChallengeResponse
+          existing: true
+
+  getReviewById:
     handler: handler.getReviewById
     events:
       - http:
@@ -71,7 +99,7 @@ functions:
     environment:
       MONTHLY_REVIEWS_TABLE: !Ref MonthlyReviewsTable
 
-  GetUserById:
+  getUserById:
     handler: handler.getUserById
     events:
       - http:

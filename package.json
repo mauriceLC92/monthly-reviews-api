@@ -13,9 +13,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.108",
     "aws-sdk": "^2.1238.0",
     "esbuild": "^0.15.12",
     "serverless": "^3.23.0",
     "serverless-esbuild": "^1.33.0"
+  },
+  "dependencies": {
+    "@types/uuid": "^8.3.4",
+    "uuid": "^9.0.0"
   }
 }
